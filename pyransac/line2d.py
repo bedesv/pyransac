@@ -7,6 +7,8 @@ This module contains the model for a 2-dimensional line.
 from dataclasses import dataclass
 import math
 from typing import List
+from scipy import spatial
+import itertools
 
 # Local application imports
 from pyransac.base import Model
@@ -22,6 +24,7 @@ class Point2D:
     """x coordinate of point."""
     y: float  # pylint: disable=invalid-name
     """y coordinate of point"""
+    index: int
 
 
 class Line2D(Model):
@@ -56,6 +59,34 @@ class Line2D(Model):
         :return: x intercept of line (None if model not made).
         """
         return self._x_int
+    
+    def update_slope(self, points: List[Point2D]) -> None:
+        self._slope = self.calculate_slope(points)
+
+    def calculate_slope(self, points: List[Point2D]) -> float:
+        """
+            Finds the points in the line that are futhest away from each other.
+            Uses those to calculate the slope.
+
+            Original method of the library just used the two first points in the list, which is 
+            susceptible to error.
+        """ 
+        if len(points) > 2:
+            points = [[point.x, point.y] for point in points]
+            hull = spatial.ConvexHull(points)
+            print(hull.vertices)
+            furthest_points = []
+            max_distance = 0
+            for i, j in itertools.product(hull.vertices, hull.vertices):
+                distance = math.dist(points[i], points[j])
+                if distance > max_distance:
+                    furthest_points = [points[i], points[j]]
+
+            return (furthest_points[0][0] - furthest_points[1][0]) / (furthest_points[0][1] -
+                                                         furthest_points[1][1])
+        else:
+            return (points[0].y - points[1].y) / (points[0].x -
+                                                         points[1].x)
 
     def make_model(self, points: List[Point2D]) -> None:
         """Makes equation for 2D line given two data points.
@@ -70,8 +101,8 @@ class Line2D(Model):
             raise ValueError(f'Need 2 points to make line, not {len(points)}')
 
         try:
-            self._slope = (points[0].y - points[1].y) / (points[0].x -
-                                                         points[1].x)
+            
+            self._slope = self.calculate_slope(points)
         except ZeroDivisionError:
             self._slope = math.nan
             self._y_int = math.nan
