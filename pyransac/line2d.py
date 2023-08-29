@@ -103,6 +103,7 @@ class Line2D(Model):
         furthest_points = []
         if len(set(points)) < 2:
             raise ValueError(f"Need at least two distinct points to calculate the furthest apart points")
+        
         elif len(points) > 2:
             primitive_points = [[point.x, point.y] for point in points]
 
@@ -155,7 +156,6 @@ class Line2D(Model):
         """ 
 
         furthest_points = self.find_furthest_apart_points(points)
-
         slope = ((furthest_points[0].y - furthest_points[1].y) / 
                  (furthest_points[0].x - furthest_points[1].x))
         return slope

@@ -50,6 +50,9 @@ def find_inliers(points: List, model: Model, params: RansacParams):
 
     while i < iterations:
         sample_points = random.choices(points, k=params.samples)
+        while len(set(sample_points)) < 2:
+            sample_points = random.choices(points, k=params.samples)
+
         model.make_model(sample_points)
         supporters = _find_supporters(points, model, params.threshold)
 
@@ -69,6 +72,49 @@ def find_inliers(points: List, model: Model, params: RansacParams):
         i += 1
 
     return inliers
+
+def find_inliers_custom(points: List, model: Model, params: RansacParams):
+    """Find the inliers from a data set.
+
+    Finds the inliers from a given data set given a model and
+    an error function.
+
+    :param points: data points to evaluate
+    :param model: type of model to which the data should adhere
+    :param params: parameters for the RANSAC algorithm
+    :return: inliers
+    """
+    inliers = []
+    max_support = 0
+    iterations = params.iterations
+    i = 0
+
+    results = []
+
+    while i < iterations:
+        sample_points = random.choices(points, k=params.samples)
+        while len(set(sample_points)) < 2 :#and not all(all(sample_point not in line[2] for sample_point in sample_points) for line in results):
+            sample_points = random.choices(points, k=params.samples)
+
+        model.make_model(sample_points)
+        supporters = _find_supporters(points, model, params.threshold)
+
+        performance = len(supporters) / len(points)
+
+        results.append((performance, sample_points, supporters))
+
+        if len(supporters) > max_support and len(supporters) < 16:
+            max_support = len(supporters)
+            confidence = 1 - params.confidence
+            ratio = len(supporters) / len(points)
+            if ratio == 1:
+                break
+
+            iterations = log(confidence) / log(1 - ratio ** params.samples)
+
+        i += 1
+
+    return sorted(results, key = lambda x: x[0], reverse=True)[:5]
 
 
 def _find_supporters(points: List, model: Model, threshold: float) -> List:
