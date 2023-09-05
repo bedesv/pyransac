@@ -79,6 +79,8 @@ def find_inliers_custom(points: List, model: Model, params: RansacParams):
     Finds the inliers from a given data set given a model and
     an error function.
 
+    Returns the top 10 models based on their performance
+
     :param points: data points to evaluate
     :param model: type of model to which the data should adhere
     :param params: parameters for the RANSAC algorithm
@@ -93,7 +95,7 @@ def find_inliers_custom(points: List, model: Model, params: RansacParams):
 
     while i < iterations:
         sample_points = random.choices(points, k=params.samples)
-        while len(set(sample_points)) < 2 :#and not all(all(sample_point not in line[2] for sample_point in sample_points) for line in results):
+        while len(set(sample_points)) < 2 :
             sample_points = random.choices(points, k=params.samples)
 
         model.make_model(sample_points)
@@ -103,18 +105,9 @@ def find_inliers_custom(points: List, model: Model, params: RansacParams):
 
         results.append((performance, sample_points, supporters))
 
-        if len(supporters) > max_support and len(supporters) < 16:
-            max_support = len(supporters)
-            confidence = 1 - params.confidence
-            ratio = len(supporters) / len(points)
-            if ratio == 1:
-                break
-
-            iterations = log(confidence) / log(1 - ratio ** params.samples)
-
         i += 1
 
-    return sorted(results, key = lambda x: x[0], reverse=True)[:5]
+    return sorted(results, key = lambda x: x[0], reverse=True)[:10]
 
 
 def _find_supporters(points: List, model: Model, threshold: float) -> List:

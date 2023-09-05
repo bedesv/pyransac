@@ -4,6 +4,7 @@ This module contains the model for a 2-dimensional line.
 """
 
 # Standard library imports
+from __future__ import annotations
 from dataclasses import dataclass
 import math
 from typing import List, Optional
@@ -12,7 +13,6 @@ import itertools
 
 # Local application imports
 from pyransac.base import Model
-
 
 @dataclass(order=True)
 class Point2D:
@@ -31,7 +31,7 @@ class Point2D:
     """Optional: index used to store a reference to the point's place in it's original list"""
     index: Optional[int] = None
 
-    def __eq__(self, other):
+    def __eq__(self, other: Point2D):
         if not isinstance(other, Point2D):
             return False
         
@@ -75,6 +75,30 @@ class Line2D(Model):
             :return: x intercept of line (None if model not made).
         """
         return self._x_int
+    
+    def __eq__(self, other) -> bool:
+        """
+            Overrides the equality function.
+
+            Calls the existing equals within threshold function with a threshold of 0.
+
+            :return: True if lines are equal, False if not.
+        """
+        return self.equals_within_threshold(other)
+
+    def equals_within_threshold(self, other, threshold=0, check_slope=True, check_x=True, check_y=True) -> bool:
+        """
+            Checks if the line is equal to the given line within a given threshold
+
+             :return: True if lines are equal within the threshold, False if not.
+        """
+
+        if isinstance(other, Line2D) and \
+           (not check_x or abs(self.x_int - other.x_int) <= threshold) and \
+           (not check_y or abs(self.y_int - other.y_int) <= threshold) and \
+           (not check_slope or abs(self.slope - other.slope) <= threshold):
+            return True
+        return False
     
     def update_slope(self, points: List[Point2D]) -> None:
         """
