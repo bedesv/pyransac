@@ -7,7 +7,7 @@ This module contains the core code for the RANSAC algorithm.
 from dataclasses import dataclass
 from math import log
 import random
-from typing import List
+from typing import List, Optional
 
 # Local application imports
 from pyransac.base import Model
@@ -30,6 +30,8 @@ class RansacParams:
 
     threshold: float
     """The error threshold to consider a point an inlier"""
+
+    expected_slope: Optional[float]
 
 
 def find_inliers(points: List, model: Model, params: RansacParams):
@@ -99,11 +101,13 @@ def find_inliers_custom(points: List, model: Model, params: RansacParams):
             sample_points = random.choices(points, k=params.samples)
 
         model.make_model(sample_points)
-        supporters = _find_supporters(points, model, params.threshold)
 
-        performance = len(supporters) / len(points)
+        if abs(model.slope - params.expected_slope) < 0.2:
+            supporters = _find_supporters(points, model, params.threshold)
 
-        results.append((performance, sample_points, supporters))
+            performance = len(supporters) / len(points)
+
+            results.append((performance, sample_points, supporters))
 
         i += 1
 
