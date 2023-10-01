@@ -48,6 +48,7 @@ class Line2D(Model):
         self._slope = slope
         self._y_int = y_int
         self._x_int = x_int
+        self._angle = self.get_angle(slope) if slope else None
 
     @property
     def slope(self):
@@ -76,6 +77,17 @@ class Line2D(Model):
         """
         return self._x_int
     
+    @property
+    def angle(self):
+        """
+            Gets the angle in degrees of the model.
+
+            :return: slope of the model (None of model not made).
+        """
+
+        return self._angle
+    
+
     def __eq__(self, other) -> bool:
         """
             Overrides the equality function.
@@ -85,6 +97,19 @@ class Line2D(Model):
             :return: True if lines are equal, False if not.
         """
         return self.equals_within_threshold(other)
+
+
+    def get_angle(self, slope: float) -> float:
+        """
+            Converts a given slope to an angle in degrees with respect to the x-axis.
+
+            :param slope: The slope to convert.
+
+            :return: Angle in degrees.
+        """
+        radians = math.atan(slope)
+        return math.degrees(radians)
+
 
     def equals_within_threshold(self, other, threshold=0, check_slope=True, check_x=True, check_y=True) -> bool:
         """
@@ -100,6 +125,7 @@ class Line2D(Model):
             return True
         return False
     
+
     def update_slope(self, points: List[Point2D]) -> None:
         """
             Updates the slope of the model using the given points as a basis
@@ -109,6 +135,8 @@ class Line2D(Model):
             :return: None
         """
         self._slope = self.calculate_slope(points)
+        self._angle = self.get_angle(self._slope)
+
 
     def find_furthest_apart_points(self, points: List[Point2D]) -> List[Point2D]:
         """
@@ -164,6 +192,7 @@ class Line2D(Model):
 
         return furthest_points
 
+
     def calculate_slope(self, points: List[Point2D]) -> float:
         """
             Assumes the input points are inliers of a line
@@ -184,6 +213,7 @@ class Line2D(Model):
                  (furthest_points[0].x - furthest_points[1].x))
         return slope
 
+
     def make_model(self, points: List[Point2D]) -> None:
         """
             Makes equation for 2D line given two data points.
@@ -200,8 +230,10 @@ class Line2D(Model):
         try:
             
             self._slope = self.calculate_slope(points)
+            self._angle = self.get_angle(self._slope)
         except ZeroDivisionError:
             self._slope = math.nan
+            self._angle = self.get_angle(self._slope)
             self._y_int = math.nan
             self._x_int = points[0].x
             return
@@ -212,6 +244,7 @@ class Line2D(Model):
             self._x_int = -1 * self._y_int / self._slope
         except ZeroDivisionError:
             self._x_int = math.nan
+
 
     def calc_error(self, point: Point2D) -> float:
         """

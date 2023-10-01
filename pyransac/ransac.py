@@ -12,7 +12,7 @@ from typing import List, Optional
 # Local application imports
 from pyransac.base import Model
 
-MODEL_SLOPE_TOLERANCE = 0.2
+MODEL_SLOPE_TOLERANCE = 10
 
 @dataclass
 class RansacParams:
@@ -32,7 +32,7 @@ class RansacParams:
     threshold: float
     """The error threshold to consider a point an inlier"""
 
-    expected_slope: Optional[float]
+    expected_angle: Optional[float]
 
 
 def find_inliers(points: List, model: Model, params: RansacParams):
@@ -103,7 +103,7 @@ def find_inliers_custom(points: List, model: Model, params: RansacParams):
 
         model.make_model(sample_points)
 
-        if abs(model.slope - params.expected_slope) < MODEL_SLOPE_TOLERANCE:
+        if abs(model.angle - params.expected_angle) < MODEL_SLOPE_TOLERANCE:
             supporters = _find_supporters(points, model, params.threshold)
 
             performance = len(supporters) / len(points)
