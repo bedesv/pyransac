@@ -12,6 +12,7 @@ from typing import List, Optional
 # Local application imports
 from pyransac.base import Model
 
+MODEL_SLOPE_TOLERANCE = 0.2
 
 @dataclass
 class RansacParams:
@@ -102,7 +103,7 @@ def find_inliers_custom(points: List, model: Model, params: RansacParams):
 
         model.make_model(sample_points)
 
-        if abs(model.slope - params.expected_slope) < 0.2:
+        if abs(model.slope - params.expected_slope) < MODEL_SLOPE_TOLERANCE:
             supporters = _find_supporters(points, model, params.threshold)
 
             performance = len(supporters) / len(points)
