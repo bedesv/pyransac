@@ -14,6 +14,7 @@ import itertools
 # Local application imports
 from pyransac.base import Model
 
+
 @dataclass(order=True)
 class Point2D:
     """
@@ -24,26 +25,28 @@ class Point2D:
 
     """x coordinate of point."""
     x: float  # pylint: disable=invalid-name
-    
+
     """y coordinate of point"""
     y: float  # pylint: disable=invalid-name
-    
+
     """Optional: index used to store a reference to the point's place in it's original list"""
     index: Optional[int] = None
 
     def __eq__(self, other: Point2D):
         if not isinstance(other, Point2D):
             return False
-        
+
         return self.x == other.x and self.y == other.y and self.index == other.index
-    
+
     def __hash__(self):
         return hash((self.x, self.y, self.index))
+
 
 class Line2D(Model):
     """
         Model for a 2-dimensional line.
     """
+
     def __init__(self, slope=None, y_int=None, x_int=None):
         self._slope = slope
         self._y_int = y_int
@@ -76,7 +79,7 @@ class Line2D(Model):
             :return: x intercept of line (None if model not made).
         """
         return self._x_int
-    
+
     @property
     def angle(self):
         """
@@ -86,7 +89,6 @@ class Line2D(Model):
         """
 
         return self._angle
-    
 
     def __eq__(self, other) -> bool:
         """
@@ -97,7 +99,6 @@ class Line2D(Model):
             :return: True if lines are equal, False if not.
         """
         return self.equals_within_threshold(other)
-
 
     def get_angle(self, slope: float) -> float:
         """
@@ -110,7 +111,6 @@ class Line2D(Model):
         radians = math.atan(slope)
         return math.degrees(radians)
 
-
     def equals_within_threshold(self, other, threshold=0, check_slope=True, check_x=True, check_y=True) -> bool:
         """
             Checks if the line is equal to the given line within a given threshold
@@ -119,12 +119,11 @@ class Line2D(Model):
         """
 
         if isinstance(other, Line2D) and \
-           (not check_x or abs(self.x_int - other.x_int) <= threshold) and \
-           (not check_y or abs(self.y_int - other.y_int) <= threshold) and \
-           (not check_slope or abs(self.slope - other.slope) <= threshold):
+                (not check_x or abs(self.x_int - other.x_int) <= threshold) and \
+                (not check_y or abs(self.y_int - other.y_int) <= threshold) and \
+                (not check_slope or abs(self.slope - other.slope) <= threshold):
             return True
         return False
-    
 
     def update_slope(self, points: List[Point2D]) -> None:
         """
@@ -136,7 +135,6 @@ class Line2D(Model):
         """
         self._slope = self.calculate_slope(points)
         self._angle = self.get_angle(self._slope)
-
 
     def find_furthest_apart_points(self, points: List[Point2D]) -> List[Point2D]:
         """
@@ -155,7 +153,7 @@ class Line2D(Model):
         furthest_points = []
         if len(set(points)) < 2:
             raise ValueError(f"Need at least two distinct points to calculate the furthest apart points")
-        
+
         elif len(points) > 2:
             primitive_points = [[point.x, point.y] for point in points]
 
@@ -175,9 +173,9 @@ class Line2D(Model):
             max_distance = 0
 
             # Iterate over all combinations of the points on the convex hull
-            for i, j in itertools.product(convex_hull_indices, convex_hull_indices): 
+            for i, j in itertools.product(convex_hull_indices, convex_hull_indices):
                 # Find the euclidean distance between the points
-                distance = math.dist(primitive_points[i], primitive_points[j]) 
+                distance = math.dist(primitive_points[i], primitive_points[j])
 
                 # Update the furthest apart points
                 if distance > max_distance:
@@ -192,7 +190,6 @@ class Line2D(Model):
 
         return furthest_points
 
-
     def calculate_slope(self, points: List[Point2D]) -> float:
         """
             Assumes the input points are inliers of a line
@@ -206,13 +203,12 @@ class Line2D(Model):
 
             :param points: list of data points
             :return: float value of the rise/run slope 
-        """ 
+        """
 
         furthest_points = self.find_furthest_apart_points(points)
-        slope = ((furthest_points[0].y - furthest_points[1].y) / 
+        slope = ((furthest_points[0].y - furthest_points[1].y) /
                  (furthest_points[0].x - furthest_points[1].x))
         return slope
-
 
     def make_model(self, points: List[Point2D]) -> None:
         """
@@ -228,7 +224,7 @@ class Line2D(Model):
             raise ValueError(f'Need 2 points to make line, not {len(points)}')
 
         try:
-            
+
             self._slope = self.calculate_slope(points)
             self._angle = self.get_angle(self._slope)
         except ZeroDivisionError:
@@ -244,7 +240,6 @@ class Line2D(Model):
             self._x_int = -1 * self._y_int / self._slope
         except ZeroDivisionError:
             self._x_int = math.nan
-
 
     def calc_error(self, point: Point2D) -> float:
         """

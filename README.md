@@ -1,6 +1,11 @@
-![](https://github.com/MeelonUsk/pyransac/workflows/Continuous%20Integration/badge.svg)
-[![codecov](https://codecov.io/gh/MeelonUsk/pyransac/branch/master/graph/badge.svg)](https://codecov.io/gh/MeelonUsk/pyransac)
-[![Documentation Status](https://readthedocs.org/projects/pyransac/badge/?version=latest)](https://pyransac.readthedocs.io/en/latest/?badge=latest)
+This package has been forked from [adamlm/pyransac](https://github.com/adamlm/pyransac). Some modifications have been made to suit my requirements in a university project.  
+The following changes have been made:
+- Changing line slope calculation to use the furthest away points, rather than the first two in the list. This provides more accurate slope measurements as the first two points in the list could be very close together and not representative of the entire line.
+- Added a modified RANSAC algorithm to return the top ten lines found, rather than just the best one.
+- Added methods to check the equality of two line models.
+- Added an expected slope to the RANSAC algorithm to only generate line models that have a slope similar to what the slope is expected to be.
+- Added a conversion from a rise over run slope to an angle in degrees.
+
 
 # `pyransac` package
 This package is a general random sample consensus (RANSAC) framework. For

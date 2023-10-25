@@ -14,6 +14,7 @@ from pyransac.base import Model
 
 MODEL_SLOPE_TOLERANCE = 10
 
+
 @dataclass
 class RansacParams:
     """Random sample consensus (RANSAC) function parameters.
@@ -76,6 +77,7 @@ def find_inliers(points: List, model: Model, params: RansacParams):
 
     return inliers
 
+
 def find_inliers_custom(points: List, model: Model, params: RansacParams):
     """Find the inliers from a data set.
 
@@ -98,7 +100,7 @@ def find_inliers_custom(points: List, model: Model, params: RansacParams):
 
     while i < iterations:
         sample_points = random.choices(points, k=params.samples)
-        while len(set(sample_points)) < 2 :
+        while len(set(sample_points)) < 2:
             sample_points = random.choices(points, k=params.samples)
 
         model.make_model(sample_points)
@@ -112,7 +114,7 @@ def find_inliers_custom(points: List, model: Model, params: RansacParams):
 
         i += 1
 
-    return sorted(results, key = lambda x: x[0], reverse=True)[:10]
+    return sorted(results, key=lambda x: x[0], reverse=True)[:10]
 
 
 def _find_supporters(points: List, model: Model, threshold: float) -> List:
