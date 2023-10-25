@@ -33,7 +33,7 @@ class RansacParams:
     threshold: float
     """The error threshold to consider a point an inlier"""
 
-    expected_angle: Optional[float]
+    expected_angle: Optional[float] = None
 
 
 def find_inliers(points: List, model: Model, params: RansacParams):
@@ -99,9 +99,14 @@ def find_inliers_custom(points: List, model: Model, params: RansacParams):
     results = []
 
     while i < iterations:
-        sample_points = random.choices(points, k=params.samples)
-        while len(set(sample_points)) < 2:
+        try:
+            if len(points) < 2:
+                return results
             sample_points = random.choices(points, k=params.samples)
+            while len(set(sample_points)) < 2:
+                sample_points = random.choices(points, k=params.samples)
+        except IndexError:
+            return results
 
         model.make_model(sample_points)
 
