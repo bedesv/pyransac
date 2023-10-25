@@ -11,14 +11,12 @@ import unittest
 from unittest.mock import MagicMock
 
 # Local application imports
-import sys
-sys.path.insert(0, "/home/bedesv/pyransac")
 from pyransac import line2d
 
 
-class TestLine2D(unittest.TestCase):
+class TestPoint2D(unittest.TestCase):
     """
-		Test the 2D line module.
+        Test the 2D point module.
     """
     def test_point2d(self) -> None:
         """
@@ -28,9 +26,6 @@ class TestLine2D(unittest.TestCase):
 
         self.assertEqual(test_point.x, 1)
         self.assertEqual(test_point.y, 2)
-
-
-
 
     """
         ************** Point2D Equality **************    
@@ -47,7 +42,7 @@ class TestLine2D(unittest.TestCase):
 
     def test_point2d_eq_true_with_index(self) -> None:
         """
-			Test Point2D class equality method with indexes.
+            Test Point2D class equality method with indexes.
         """
         test_point_1 = line2d.Point2D(1, 2, 5)
         test_point_2 = line2d.Point2D(1, 2, 5)
@@ -96,7 +91,7 @@ class TestLine2D(unittest.TestCase):
 
     def test_point2d_eq_different_index(self) -> None:
         """
-			Test Point2D class equality method when indexes
+            Test Point2D class equality method when indexes
             are different.
         """
         test_point_1 = line2d.Point2D(1, 2, 4)
@@ -106,7 +101,7 @@ class TestLine2D(unittest.TestCase):
 
     def test_point2d_eq_one_with_index(self) -> None:
         """
-			Test Point2D class equality method when only
+            Test Point2D class equality method when only
             one point has an index.
         """
         test_point_1 = line2d.Point2D(1, 2)
@@ -116,14 +111,12 @@ class TestLine2D(unittest.TestCase):
 
     def test_point2d_eq_with_different_type(self) -> None:
         """
-			Test Point2D class equality method when testing
+            Test Point2D class equality method when testing
             against an integer.
         """
         test_point = line2d.Point2D(1, 2)
 
         self.assertNotEqual(test_point, 5)
-
-
 
     """
         ************** Point2D Hash **************    
@@ -140,7 +133,7 @@ class TestLine2D(unittest.TestCase):
 
     def test_point2d_hash_true_with_index(self) -> None:
         """
-			Test Point2D class hash method with indexes.
+            Test Point2D class hash method with indexes.
         """
         test_point_1 = line2d.Point2D(1, 2, 5)
         test_point_2 = line2d.Point2D(1, 2, 5)
@@ -189,7 +182,7 @@ class TestLine2D(unittest.TestCase):
 
     def test_point2d_hash_different_index(self) -> None:
         """
-			Test Point2D class hash method when indexes
+            Test Point2D class hash method when indexes
             are different.
         """
         test_point_1 = line2d.Point2D(1, 2, 4)
@@ -199,7 +192,7 @@ class TestLine2D(unittest.TestCase):
 
     def test_point2d_hash_one_with_index(self) -> None:
         """
-			Test Point2D class hash method when only
+            Test Point2D class hash method when only
             one point has an index.
         """
         test_point_1 = line2d.Point2D(1, 2)
@@ -208,7 +201,10 @@ class TestLine2D(unittest.TestCase):
         self.assertNotEqual(hash(test_point_1), hash(test_point_2))
 
 
-
+class TestLine2D(unittest.TestCase):
+    """
+		Test the 2D line module.
+    """
 
     """
         ************** Line2D Initialisation **************    
@@ -233,9 +229,6 @@ class TestLine2D(unittest.TestCase):
         self.assertEqual(test_model.slope, 1)
         self.assertEqual(test_model.y_int, 2)
         self.assertEqual(test_model.x_int, 3)
-
-
-
 
     """
         ************** Line2D Make Model **************    
@@ -303,8 +296,48 @@ class TestLine2D(unittest.TestCase):
         self.assertEqual(test_model.y_int, 2)
         self.assertEqual(test_model.x_int, 2)
 
+        """
+                ************** Line2D Get Error **************    
+        """
+    def test_get_angle_positive_slope(self):
+        """
+            Test that get_angle returns the correct angle for a positive slope.
+        """
+        line = line2d.Line2D(slope=1)
+        expected_angle = 45.0  # atan(1) in degrees
+        self.assertAlmostEqual(line.get_angle(1), expected_angle, places=5)
 
+    def test_get_angle_negative_slope(self):
+        """
+            Test that get_angle returns the correct angle for a negative slope.
+        """
+        line = line2d.Line2D(slope=-1)
+        expected_angle = -45.0  # atan(-1) in degrees
+        self.assertAlmostEqual(line.get_angle(-1), expected_angle, places=5)
 
+    def test_get_angle_zero_slope(self):
+        """
+            Test that get_angle returns the correct angle for a zero slope.
+        """
+        line = line2d.Line2D(slope=0)
+        expected_angle = 0.0  # atan(0) in degrees
+        self.assertAlmostEqual(line.get_angle(0), expected_angle, places=5)
+
+    def test_get_angle_infinity_slope(self):
+        """
+            Test that get_angle returns the correct angle for an infinite slope.
+        """
+        line = line2d.Line2D(slope=math.inf)
+        expected_angle = 90.0  # atan(inf) in degrees
+        self.assertAlmostEqual(line.get_angle(math.inf), expected_angle, places=5)
+
+    def test_get_angle_minus_infinity_slope(self):
+        """
+            Test that get_angle returns the correct angle for a negative infinite slope.
+        """
+        line = line2d.Line2D(slope=-math.inf)
+        expected_angle = -90.0  # atan(-inf) in degrees
+        self.assertAlmostEqual(line.get_angle(-math.inf), expected_angle, places=5)
 
     """
         ************** Line2D Get Error **************    
@@ -353,9 +386,6 @@ class TestLine2D(unittest.TestCase):
         error = test_model.calc_error(point=test_point)
 
         self.assertAlmostEqual(error, 8 * math.sqrt(10) / 5)
-
-
-
 
     """
         ************** Line2D Find Furthest Points **************    
@@ -430,11 +460,11 @@ class TestLine2D(unittest.TestCase):
         """
         test_model = line2d.Line2D()
 
-        points = [line2d.Point2D(1, 2), line2d.Point2D(2, 1.9999), line2d.Point2D(3, 2.0001), 
+        points = [line2d.Point2D(1, 2), line2d.Point2D(2, 1.9999), line2d.Point2D(3, 2.0001),
                   line2d.Point2D(4, 2.005), line2d.Point2D(5, 1.994), line2d.Point2D(6, 2.06),
                   line2d.Point2D(7, 2.003), line2d.Point2D(8, 1.9995), line2d.Point2D(9, 1.9998),
                   line2d.Point2D(10, 2.003)]
-        
+
         furthest_points = test_model.find_furthest_apart_points(points)
 
         for i in range(0, 10):
@@ -449,18 +479,15 @@ class TestLine2D(unittest.TestCase):
         """
         test_model = line2d.Line2D()
 
-        points = [line2d.Point2D(1, 2), line2d.Point2D(2, 2), line2d.Point2D(3, 2.), 
+        points = [line2d.Point2D(1, 2), line2d.Point2D(2, 2), line2d.Point2D(3, 2.),
                   line2d.Point2D(4, 2), line2d.Point2D(5, 2), line2d.Point2D(6, 2),
                   line2d.Point2D(7, 2), line2d.Point2D(8, 2), line2d.Point2D(9, 2),
                   line2d.Point2D(10, 2)]
-        
+
         furthest_points = test_model.find_furthest_apart_points(points)
 
         self.assertIn(points[0], furthest_points)
         self.assertIn(points[1], furthest_points)
-
-
-
 
     """
         ************** Line2D Calculate Slope **************    
@@ -474,7 +501,7 @@ class TestLine2D(unittest.TestCase):
 
         points = [line2d.Point2D(1, 2), line2d.Point2D(2, 3)]
 
-        test_model.find_furthest_apart_points = MagicMock(return_value = points)
+        test_model.find_furthest_apart_points = MagicMock(return_value=points)
         slope = test_model.calculate_slope(None)
 
         expected_answer = 1
@@ -488,7 +515,7 @@ class TestLine2D(unittest.TestCase):
 
         points = [line2d.Point2D(2, 3), line2d.Point2D(1, 2)]
 
-        test_model.find_furthest_apart_points = MagicMock(return_value = points)
+        test_model.find_furthest_apart_points = MagicMock(return_value=points)
         slope = test_model.calculate_slope(None)
 
         expected_answer = 1
@@ -502,11 +529,11 @@ class TestLine2D(unittest.TestCase):
 
         points = [line2d.Point2D(-1, -2), line2d.Point2D(-1000, -4000)]
 
-        test_model.find_furthest_apart_points = MagicMock(return_value = points)
+        test_model.find_furthest_apart_points = MagicMock(return_value=points)
         slope = test_model.calculate_slope(None)
 
         expected_answer = 4
-        self.assertEqual(expected_answer, int(slope)) # Cast to int because of floating point inaccuracy
+        self.assertEqual(expected_answer, int(slope))  # Cast to int because of floating point inaccuracy
 
     def test_calculate_slope_negative_numbers_different_order(self) -> None:
         """
@@ -516,11 +543,11 @@ class TestLine2D(unittest.TestCase):
 
         points = [line2d.Point2D(-1000, -4000), line2d.Point2D(-1, -2)]
 
-        test_model.find_furthest_apart_points = MagicMock(return_value = points)
+        test_model.find_furthest_apart_points = MagicMock(return_value=points)
         slope = test_model.calculate_slope(None)
 
         expected_answer = 4
-        self.assertEqual(expected_answer, int(slope)) # Cast to int because of floating point inaccuracy
+        self.assertEqual(expected_answer, int(slope))  # Cast to int because of floating point inaccuracy
 
     def test_calculate_slope_horizontal_line(self) -> None:
         """
@@ -529,7 +556,7 @@ class TestLine2D(unittest.TestCase):
         test_model = line2d.Line2D()
 
         points = [line2d.Point2D(1, 2), line2d.Point2D(4, 2)]
-        test_model.find_furthest_apart_points = MagicMock(return_value = points)
+        test_model.find_furthest_apart_points = MagicMock(return_value=points)
         slope = test_model.calculate_slope(None)
 
         expected_answer = 0
@@ -542,7 +569,7 @@ class TestLine2D(unittest.TestCase):
         test_model = line2d.Line2D()
 
         points = [line2d.Point2D(1, 2), line2d.Point2D(1, 4)]
-        test_model.find_furthest_apart_points = MagicMock(return_value = points)
+        test_model.find_furthest_apart_points = MagicMock(return_value=points)
 
         self.assertRaises(ZeroDivisionError, test_model.calculate_slope, None)
 
@@ -556,8 +583,8 @@ class TestLine2D(unittest.TestCase):
 
         points_1 = [line2d.Point2D(0, 0), line2d.Point2D(5, 4)]
         points_2 = [line2d.Point2D(0, 0), line2d.Point2D(-5, 4)]
-        test_model_1.find_furthest_apart_points = MagicMock(return_value = points_1)
-        test_model_2.find_furthest_apart_points = MagicMock(return_value = points_2)
+        test_model_1.find_furthest_apart_points = MagicMock(return_value=points_1)
+        test_model_2.find_furthest_apart_points = MagicMock(return_value=points_2)
 
         slope_1 = test_model_1.calculate_slope(None)
         slope_2 = test_model_2.calculate_slope(None)
@@ -575,14 +602,15 @@ class TestLine2D(unittest.TestCase):
 
         points_1 = [line2d.Point2D(0, 0), line2d.Point2D(5, 4)]
         points_2 = [line2d.Point2D(0, 0), line2d.Point2D(5, -4)]
-        test_model_1.find_furthest_apart_points = MagicMock(return_value = points_1)
-        test_model_2.find_furthest_apart_points = MagicMock(return_value = points_2)
+        test_model_1.find_furthest_apart_points = MagicMock(return_value=points_1)
+        test_model_2.find_furthest_apart_points = MagicMock(return_value=points_2)
 
         slope_1 = test_model_1.calculate_slope(None)
         slope_2 = test_model_2.calculate_slope(None)
 
         self.assertNotEqual(slope_1, slope_2)
         self.assertEqual(-1 * slope_1, slope_2)
+
 
 if __name__ == '__main__':
     unittest.main()
